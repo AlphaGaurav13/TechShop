@@ -121,7 +121,6 @@ if (!$product) {
     }
   });
 
-  // Keep input field in sync
   qtyInput.addEventListener('input', () => {
     if (parseInt(qtyInput.value) < 1 || isNaN(qtyInput.value)) {
       qtyInput.value = 1;

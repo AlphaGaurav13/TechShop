@@ -337,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     </div>
     
     <script>
-      // Auto-close modal after 5 seconds
+    
       setTimeout(() => {
         document.getElementById('success-modal').classList.add('animate__fadeOut');
         setTimeout(() => {

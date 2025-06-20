@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'&& isset($_POST['submit'])) {
         }
     }
     if ($password == $confirmpassword &&$validusername&&$validemail&&$validpassword&&!$userexist) {
+        
         $sql = "INSERT INTO users (username, email, password, confirmpassword, dateandtime) VALUES 
     ('$username', '$email', '$password', '$confirmpassword', current_timestamp())";
         $result = mysqli_query($conn, $sql);
