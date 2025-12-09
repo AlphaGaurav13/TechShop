@@ -31,7 +31,7 @@
             <div class="hidden duration-[1000ms] ease-in-out" data-carousel-item>
                 <img src="images/hom2.gif" class="w-full h-full object-cover" alt="Latest Gadgets">
                 <div class="absolute inset-0 flex flex-col justify-center items-center  text-white p-6 text-center">
-                    <h2 class="text-5xl font-bold">Fastest Devilery!</h2>
+                    <h2 class="text-5xl font-bold">Super fast Devilery!</h2>
                     <p class="text-lg">Upgrade Your Tech Game Today</p>
                 </div>
             </div>
