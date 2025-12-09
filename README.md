@@ -1,27 +1,28 @@
 # 🛍️ TechShop – E-Commerce Website
 
 Welcome to **TechShop**, a modern and minimal e-commerce platform built for all your gadget needs! ⚙️  
-Built using **PHP**, **HTML**, **Tailwind CSS**, and **MySQL**, this platform allows users to shop seamlessly with a complete cart and wishlist experience.
+Developed with **PHP**, **HTML**, **Tailwind CSS**, and **MySQL**, this platform enables a smooth and dynamic shopping experience.
 
-🔗 **Visit the Website:**
-## http://techshop.infinityfreeapp.com/?i=1
+🔗 **Live Website:**  
+👉 http://techshop.infinityfreeapp.com/?i=1
 
 ---
 
 ## 🚀 Features
 
-✨ **User Authentication**  
-- 🔐 Signup, Login, Logout system with session management  
-- 🔒 Secure password handling and validation  
+### 🔐 Authentication
+- Secure Login / Signup
+- Session-based User Authentication
 
-🛒 **Shopping Experience**  
-- ✅ Add to Cart functionality  
-- ❤️ Wishlist page for favorite items  
-- 📄 Individual Product Pages with details fetched dynamically
+### 🛒 Shopping Features
+- Add to Cart & Wishlist
+- Product detail pages
+- Dynamic price updates
 
-🧰 **User Dashboard**  
-- View saved items in cart & wishlist  
-- Continue shopping or proceed to checkout  
+### 👤 User Account Features
+- View Cart & Wishlist
+- Checkout Page (Future update)
+- Order History (Upcoming)
 
 ---
 
@@ -29,29 +30,22 @@ Built using **PHP**, **HTML**, **Tailwind CSS**, and **MySQL**, this platform al
 
 | Layer        | Technology                |
 |--------------|---------------------------|
-| 💻 Frontend  | HTML, Tailwind CSS        |
-| ⚙️ Backend   | PHP                       |
-| 🗄️ Database  | MySQL                     |
-| 🌐 Hosting   | infinity                  |
+| Frontend     | HTML, Tailwind CSS        |
+| Backend      | PHP                       |
+| Database     | MySQL                     |
+| DevOps       | Jenkins CI/CD Pipeline    |
+| Web Server   | Apache (XAMPP)            |
+| Version Ctrl | Git + GitHub              |
 
 ---
 
-## 🗃️ Database Overview (MySQL)
+## 🤖 DevOps & CI/CD With Jenkins (Local Deployment Automation)
 
-**Key Tables:**
-- `users` – Stores user details (email, password, etc.)
-- `products` – Product catalog with name, price, description, and image
-- `cart` – Tracks items added to the cart by each user
-- `wishlist` – Keeps a list of user's favorite products
-- `orders`  – For storing order history if implemented
+We implemented a **Jenkins CI/CD Pipeline** to automatically deploy updates to local XAMPP server.
 
----
+### 🔁 CI/CD Flow
 
-## 📂 Folder Structure
-![alt text](image.png)
-
-## 🧪 How to Run Locally
-
-1. 📥 **Clone the Repo**
-   ```bash
-## https://github.com/rohitsingh2814/E-commerce.git
+✔ Push Code → GitHub  
+✔ Jenkins Auto Builds → Git Pull  
+✔ Deletes Old Files in htdocs  
+✔ Copies New Code to:  
