@@ -17,14 +17,21 @@ pipeline {
             }
         }
 
+        stage('Docker Build') {
+            steps {
+                echo 'Building Docker image'
+                bat 'docker build -t techshop-ci-test .'
+            }
+        }
+
     }
 
     post {
         success {
-            echo 'CI PASSED ✅'
+            echo 'CI + Docker BUILD PASSED ✅'
         }
         failure {
-            echo 'CI FAILED ❌'
+            echo 'CI or Docker BUILD FAILED ❌'
         }
     }
 }
