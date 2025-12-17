@@ -1,12 +1,11 @@
 <?php
-$conn = new mysqli(
-    "db",        // service name from docker-compose
-    "techuser",  // MYSQL_USER
-    "techpass",  // MYSQL_PASSWORD
-    "techshop",  // MYSQL_DATABASE
-    3306
-);
-
-if ($conn->connect_error) {
-    die("DB Connection failed: " . $conn->connect_error);
+$host="localhost";
+$user="root";
+$password="";
+$database="e-commerce";
+$conn=mysqli_connect($host,$user,$password,$database);
+if(!$conn){
+   
+    die("Error".mysqli_connect_error());
 }
+?>
