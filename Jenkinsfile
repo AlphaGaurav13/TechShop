@@ -1,15 +1,34 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)   // ❌ Jenkins auto checkout band
+        timestamps()
+    }
+
     environment {
         IMAGE_NAME = "gaurious/techshop"
     }
 
     stages {
 
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
         stage('Checkout Code') {
             steps {
-                checkout scm
+                retry(2) {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/AlphaGaurav13/TechShop.git'
+                        ]]
+                    ])
+                }
             }
         }
 
