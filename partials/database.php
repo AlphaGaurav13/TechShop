@@ -2,7 +2,7 @@
 $conn = new mysqli(
     "host.docker.internal", // 🔥 yahin change
     "root",
-    "123",
+    "",
     "techshop",
     3307
 );
