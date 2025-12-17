@@ -16,6 +16,7 @@ if (!$product) {
     echo "<p class='text-center text-red-500'>Product not found.</p>";
     return;
 }
+
 ?>
 
 <div class="flex items-center justify-center h-screen bg-gray-200 pt-20 px-6">

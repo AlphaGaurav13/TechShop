@@ -1,71 +1,28 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout(true)   // ❌ Jenkins auto checkout band
-        timestamps()
-    }
-
-    environment {
-        IMAGE_NAME = "gaurious/techshop"
-    }
-
     stages {
 
-        stage('Clean Workspace') {
+        stage('Clone Repo') {
             steps {
-                cleanWs()
+                git 'https://github.com/AlphaGaurav13/TechShop.git'
             }
         }
 
-        stage('Checkout Code') {
+        stage('Build Docker Image') {
             steps {
-                retry(2) {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: '*/main']],
-                        userRemoteConfigs: [[
-                            url: 'https://github.com/AlphaGaurav13/TechShop.git'
-                        ]]
-                    ])
-                }
+                sh 'docker build -t techshop:latest .'
             }
         }
 
-        stage('CI Check') {
+        stage('Run Container') {
             steps {
-                bat 'echo CI check passed'
+                sh '''
+                docker stop techshop || true
+                docker rm techshop || true
+                docker run -d -p 8080:80 --name techshop techshop:latest
+                '''
             }
-        }
-
-        stage('Docker Build') {
-            steps {
-                bat 'docker build -t %IMAGE_NAME%:latest .'
-            }
-        }
-
-        stage('Docker Push') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    bat '''
-                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
-                    docker push %IMAGE_NAME%:latest
-                    '''
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'CI + Docker PUSH PASSED ✅'
-        }
-        failure {
-            echo 'PIPELINE FAILED ❌'
         }
     }
 }
