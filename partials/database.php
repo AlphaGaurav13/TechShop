@@ -1,11 +1,14 @@
 <?php
-$host="localhost";
-$user="root";
-$password="";
-$database="e-commerce";
-$conn=mysqli_connect($host,$user,$password,$database,3307);
-if(!$conn){
-   
-    die("Error".mysqli_connect_error());
+$conn = new mysqli(
+    "host.docker.internal", // 🔥 yahin change
+    "root",
+    "",
+    "techshop",
+    3307
+);
+
+if ($conn->connect_error) {
+    die("DB Connection failed: " . $conn->connect_error);
 }
+
 ?>

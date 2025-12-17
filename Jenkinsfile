@@ -2,18 +2,29 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Deploy to XAMPP') {
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t techshop:latest .'
+            }
+        }
+
+        stage('Run App Container') {
             steps {
                 bat '''
-                echo Deploying to XAMPP...
-                if not exist C:\\xampp\\htdocs\\techshop mkdir C:\\xampp\\htdocs\\techshop
-                xcopy /E /I /Y * C:\\xampp\\htdocs\\techshop
+                docker stop techshop_web || exit 0
+                docker rm techshop_web || exit 0
+                docker run -d ^
+                  -p 8080:80 ^
+                  --add-host=host.docker.internal:host-gateway ^
+                  --name techshop_web ^
+                  techshop:latest
                 '''
             }
         }
