@@ -1,13 +1,12 @@
 <?php
-$host = getenv("metro.proxy.rlwy.net");
-$port = getenv("48007");
-$user = getenv("root");
-$pass = getenv("olypCUsRsqIuzJDcKVANOdLpwJZxxbFP");
-$db   = getenv("railway");
+$host = getenv("DB_HOST");
+$db   = getenv("DB_NAME");
+$user = getenv("DB_USER");
+$pass = getenv("DB_PASSWORD");
+$port = getenv("DB_PORT");
 
-$conn = new mysqli($host, $user, $pass, $db, $port);
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
 
-if ($conn->connect_error) {
-    die("DB Connection failed: " . $conn->connect_error);
-}
-?>
+$pdo = new PDO($dsn, $user, $pass, [
+  PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+]);
