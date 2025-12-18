@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "alphagaurav/techshop"
+        DOCKER_IMAGE = "gaurious/techshop"
         DOCKER_TAG = "latest"
         DOCKER_CREDS = "dockerhub-creds"
     }
@@ -48,7 +48,7 @@ pipeline {
                   -p 8090:80 ^
                   --add-host=host.docker.internal:host-gateway ^
                   --name techshop_web ^
-                  alphagaurav/techshop:latest
+                  %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
         }
