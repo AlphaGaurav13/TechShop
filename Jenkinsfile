@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "gaurious/techshop"
-        DOCKER_TAG = "latest"
+        DOCKER_TAG   = "latest"
         DOCKER_CREDS = "dockerhub-creds"
     }
 
@@ -17,7 +17,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
+                bat """
+                docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .
+                """
             }
         }
 
@@ -28,28 +30,32 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
+                    bat """
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                    """
                 }
             }
         }
 
         stage('Push Image to Docker Hub') {
             steps {
-                bat "docker push %DOCKER_IMAGE%:%DOCKER_TAG%"
+                bat """
+                docker push %DOCKER_IMAGE%:%DOCKER_TAG%
+                """
             }
         }
 
         stage('Run App Container') {
             steps {
-                bat '''
-                docker stop techshop_web || exit 0
-                docker rm techshop_web || exit 0
+                bat """
+                docker stop techshop_web 2>NUL || echo Container not running
+                docker rm techshop_web 2>NUL || echo Container not found
+
                 docker run -d ^
                   -p 8090:80 ^
-                  --add-host=host.docker.internal:host-gateway ^
                   --name techshop_web ^
                   %DOCKER_IMAGE%:%DOCKER_TAG%
-                '''
+                """
             }
         }
     }
