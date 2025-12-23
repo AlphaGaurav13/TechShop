@@ -1,12 +1,15 @@
 FROM php:8.2-apache
 
+# MySQL extension install
 RUN docker-php-ext-install mysqli
+
+# Apache rewrite enable (optional but useful)
 RUN a2enmod rewrite
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/client
+# Copy project files to Apache root
+COPY . /var/www/html/
 
-RUN sed -ri 's!/var/www/html!/var/www/html/client!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri 's!/var/www/!/var/www/html/client!g' /etc/apache2/apache2.conf
-
-COPY . /var/www/html
+# Set proper permissions
 RUN chown -R www-data:www-data /var/www/html
+
+EXPOSE 80
