@@ -2,19 +2,18 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Build Docker Image') {
+        stage('Checkout') {
             steps {
-                bat 'docker build -t techshop:latest .'
+                checkout scm
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy to XAMPP') {
             steps {
                 bat '''
-                docker stop techshop || exit 0
-                docker rm techshop || exit 0
-                docker run -d -p 8080:80 --name techshop techshop:latest
+                echo Deploying to XAMPP...
+                if not exist C:\\xampp\\htdocs\\techshop mkdir C:\\xampp\\htdocs\\techshop
+                xcopy /E /I /Y * C:\\xampp\\htdocs\\techshop
                 '''
             }
         }
