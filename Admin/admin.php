@@ -110,7 +110,12 @@
                         <td class="py-2 px-4"><?= $row['product_info'] ?></td>
                         <td class="py-2 px-4">
                             <?php if ($row['product_image']) : ?>
-                                <img src="productimge/<?= htmlspecialchars($row['product_image']) ?>" class="h-16 w-16 object-cover rounded-md" alt="product image">
+                                <img 
+  src="productimge/<?= htmlspecialchars($row['product_image']) ?>" 
+  class="h-16 w-16 object-cover rounded-md"
+  alt="<?= htmlspecialchars($row['product_name']) ?>"
+>
+
                             <?php else : ?>
                                 <span class="text-gray-400">No image</span>
                             <?php endif; ?>
