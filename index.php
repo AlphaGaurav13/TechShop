@@ -1,4 +1,7 @@
-<?php session_start();?>
+<?php session_start();
+header("Location: home.php");
+exit();?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
