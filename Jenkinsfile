@@ -8,26 +8,25 @@ pipeline {
     }
 
     stages {
-<<<<<<< HEAD
-        stage('Checkout') {
-=======
 
         stage('Checkout Code') {
->>>>>>> 54f86ffc482748483d748eb2d9d60b4d4ff6419f
             steps {
                 checkout scm
             }
         }
 
-<<<<<<< HEAD
         stage('Deploy to XAMPP') {
             steps {
                 bat '''
                 echo Deploying to XAMPP...
-                if not exist C:\\xampp\\htdocs\\techshop mkdir C:\\xampp\\htdocs\\techshop
+                if not exist C:\\xampp\\htdocs\\techshop (
+                    mkdir C:\\xampp\\htdocs\\techshop
+                )
                 xcopy /E /I /Y * C:\\xampp\\htdocs\\techshop
                 '''
-=======
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat """
@@ -69,7 +68,6 @@ pipeline {
                   --name techshop_web ^
                   %DOCKER_IMAGE%:%DOCKER_TAG%
                 """
->>>>>>> 54f86ffc482748483d748eb2d9d60b4d4ff6419f
             }
         }
     }
