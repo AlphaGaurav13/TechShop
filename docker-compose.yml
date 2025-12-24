@@ -1,37 +1,38 @@
-services:
-  web:
-    build: .
-    container_name: techshop-web
-    ports:
-      - "8090:80"
-    volumes:
-      - .:/var/www/html
-    depends_on:
-      - db
+version: "3.8"
 
-  db:
+services:
+  mysql:
     image: mysql:8.0
-    container_name: techshop-db
+    container_name: techshop_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: techshop
-      MYSQL_USER: techuser
-      MYSQL_PASSWORD: techpass
+      MYSQL_DATABASE: techshop_db
+    ports:
+      - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: techshop-phpmyadmin
-    depends_on:
-      - db
+    container_name: techshop_phpmyadmin
+    restart: always
     ports:
-      - "8081:80"
+      - "8083:80"
     environment:
-      PMA_HOST: db
+      PMA_HOST: mysql
       PMA_USER: root
       PMA_PASSWORD: root
+    depends_on:
+      - mysql
+
+  web:
+    image: gaurious/techshop:latest
+    container_name: techshop_web
+    ports:
+      - "8090:80"
+    depends_on:
+      - mysql
 
 volumes:
-  db_data:
+  mysql_data:
