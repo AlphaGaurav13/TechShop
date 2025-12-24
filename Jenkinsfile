@@ -29,9 +29,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat """
-                docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .
-                """
+                bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
             }
         }
 
@@ -42,31 +40,22 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    bat """
-                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
-                    """
+                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
                 }
             }
         }
 
         stage('Push Image to Docker Hub') {
             steps {
-                bat """
-                docker push %DOCKER_IMAGE%:%DOCKER_TAG%
-                """
+                bat "docker push %DOCKER_IMAGE%:%DOCKER_TAG%"
             }
         }
 
-        stage('Run App Container') {
+        stage('Deploy with Docker Compose') {
             steps {
                 bat """
-                docker stop techshop_web 2>NUL || echo Container not running
-                docker rm techshop_web 2>NUL || echo Container not found
-
-                docker run -d ^
-                  -p 8090:80 ^
-                  --name techshop_web ^
-                  %DOCKER_IMAGE%:%DOCKER_TAG%
+                docker-compose down
+                docker-compose up -d
                 """
             }
         }
