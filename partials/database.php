@@ -1,12 +1,13 @@
 <?php
-$host = "db";          
-$user = "techuser";
-$password = "techpass";
-$database = "techshop";
-
-$conn = mysqli_connect($host, $user, $password, $database);
+$conn = mysqli_connect(
+  'mysql',        // service name
+  'root',         // user
+  'root',         // password
+  'techshop_db'   // database
+);
 
 if (!$conn) {
-    die("DB Connection Failed: " . mysqli_connect_error());
+  die("DB Error: " . mysqli_connect_error());
 }
+
 ?>
