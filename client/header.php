@@ -2,6 +2,22 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Check if user is admin
+$is_admin = false;
+if (isset($_SESSION['user_email'])) {
+    include_once __DIR__ . '/../partials/database.php';
+    $email = $_SESSION['user_email'];
+    $sql = "SELECT is_admin FROM users WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result && $result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $is_admin = $user['is_admin'];
+    }
+}
 ?>
 <header>
   
@@ -33,7 +49,11 @@ if (session_status() === PHP_SESSION_NONE) {
       </button>
 
       <div class="hidden w-full md:block md:w-auto" id="navbar-dropdown">
-        <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700"><?php if(isset($_SESSION['username'])){?>
+        <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <li>
+              <a href="index.php?admin=true" class="block py-2 px-3 text-white bg-red-600 rounded-lg hover:bg-red-700 md:p-2"><i class="fa-solid fa-lock me-2"></i> Admin Panel</a>
+            </li>
+            <?php if(isset($_SESSION['username'])){?>
             <li>
               <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent">
                 <i class="fa-regular fa-circle-user me-2"></i><?php echo ucfirst($_SESSION['username']); ?></button>
@@ -41,6 +61,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-400">
                   <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><i class="fa-solid fa-gear me-2"></i> Settings</a></li>
                   <li><a href="index.php?orders=true" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><i class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
+                  <li><a href="index.php?admin=true" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><i class="fa-solid fa-lock me-2"></i> Admin Panel</a></li>
                 </ul>
                 <div class="py-1">
                   <a href="server/request.php?logout=true" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"><i class="fa-solid fa-user-minus me-2"></i> Sign out</a>

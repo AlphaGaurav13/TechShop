@@ -53,6 +53,14 @@ elseif(isset($_GET['policy'])){
 elseif(isset($_GET['order_id'])){
     include ('./client/orderdetails.php');
 }
+elseif(isset($_GET['admin'])){
+    // If user not logged in, show login form instead of attempting a redirect from included file
+    if (!isset($_SESSION['user_email'])) {
+        include ('./client/login.php');
+    } else {
+        include ('./Admin/admin.php');
+    }
+}
 else{
     include ('./client/home.php'); 
 }

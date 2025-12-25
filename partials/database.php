@@ -1,13 +1,11 @@
 <?php
 $conn = mysqli_connect(
-  'mysql',        // service name
-  'root',         // user
-  'root',         // password
-  'techshop_db'   // database
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME")
 );
 
 if (!$conn) {
-  die("DB Error: " . mysqli_connect_error());
+    die("Database connection failed: " . mysqli_connect_error());
 }
-
-?>

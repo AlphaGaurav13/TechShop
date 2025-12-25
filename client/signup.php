@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $showAlert=$userexist=false;
 $validusername=$validemail=$validpassword=true;
 if ($_SERVER['REQUEST_METHOD'] == 'POST'&& isset($_POST['submit'])) {
@@ -8,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'&& isset($_POST['submit'])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
     $confirmpassword = $_POST["confirmpassword"];
+    
     if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{2,19}$/', $username)) {
         $validusername=false;
     }
@@ -17,20 +21,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'&& isset($_POST['submit'])) {
     if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/', $password)) {
         $validpassword=false;
     }
-    if ($password == $confirmpassword &&$validusername&&$validemail&&$validpassword){
-        $sql="SELECT * FROM users WHERE email = '$email'"; 
-        $result = mysqli_query($conn, $sql);
-        if(mysqli_num_rows($result)>0){
+    
+    if ($password == $confirmpassword && $validusername && $validemail && $validpassword){
+        $sql="SELECT * FROM users WHERE email = ?"; 
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows > 0){
             $userexist=true;
         }
     }
-    if ($password == $confirmpassword &&$validusername&&$validemail&&$validpassword&&!$userexist) {
-        
-        $sql = "INSERT INTO users (username, email, password, confirmpassword, dateandtime) VALUES 
-    ('$username', '$email', '$password', '$confirmpassword', current_timestamp())";
-        $result = mysqli_query($conn, $sql);
-        if ($result) {
-            $showAlert = TRUE;
+    
+    if ($password == $confirmpassword && $validusername && $validemail && $validpassword && !$userexist) {
+        $sql = "INSERT INTO users (username, email, password, confirmpassword, dateandtime) VALUES (?, ?, ?, ?, current_timestamp())";
+        $stmt = $conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param("ssss", $username, $email, $password, $confirmpassword);
+            if ($stmt->execute()) {
+                $showAlert = TRUE;
+            } else {
+                echo "<div class='alert bg-red-100 border-l-4 border-red-500 text-red-700 p-4 m-2 rounded-md'><strong>Error:</strong> " . $stmt->error . "</div>";
+            }
+            $stmt->close();
+        } else {
+            echo "<div class='alert bg-red-100 border-l-4 border-red-500 text-red-700 p-4 m-2 rounded-md'><strong>Error:</strong> " . $conn->error . "</div>";
         }
     }
 }

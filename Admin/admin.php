@@ -1,3 +1,22 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Use __DIR__ to resolve includes reliably when file is included from other scripts
+include_once __DIR__ . '/../partials/database.php';
+include_once __DIR__ . '/../partials/commonfiles.php';
+
+// Require login only — allow any logged-in user to access temporarily
+if (!isset($_SESSION['user_email'])) {
+    echo '<div class="pt-24 px-6 text-center">\n        <h2 class="text-2xl font-semibold mb-4">Please login to access Admin Panel</h2>\n        <a href="../index.php?login=true" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Login</a>\n    </div>';
+    return; // stop further rendering of admin panel when not logged in
+}
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,18 +24,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Add Product</title>
-    <?php include("../partials/commonfiles.php"); ?>
 </head>
 
 <body class="bg-gray-100 ">
     <nav class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <a href="index.php" class="flex items-center space-x-3 rtl:space-x-reverse">
+            <a href="../index.php?home=true" class="flex items-center space-x-3 rtl:space-x-reverse">
 
                 <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"><i class="fa-solid fa-bag-shopping me-2"></i>TechShop</span>
             </a>
             <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Admin Panel</button>
+                <a href="../index.php?home=true" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Back to Home</a>
 
             </div>
 
@@ -28,7 +46,7 @@
 
         <h2 class="text-2xl font-bold mb-6 text-center">Add New Product</h2>
 
-        <form action="productadd.php" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <form action="./Admin/productadd.php" method="POST" enctype="multipart/form-data" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Product ID</label>
@@ -76,9 +94,7 @@
         </form>
     </div>
     <?php
-    // Database connection
-    include '../partials/database.php';
-
+    // Database connection already included at top via __DIR__
     $query = "SELECT * FROM product ORDER BY product_id DESC";
     $result = mysqli_query($conn, $query);
 ?>
@@ -107,15 +123,13 @@
                         <td class="py-2 px-4"><?= $row['product_desc'] ?></td>
                         <td class="py-2 px-4">$<?= $row['product_price'] ?></td>
                         <td class="py-2 px-4"><?= $row['product_category'] ?></td>
-                        <td class="py-2 px-4"><?= $row['product_info'] ?></td>
                         <td class="py-2 px-4">
                             <?php if ($row['product_image']) : ?>
-                                <img 
-  src="productimge/<?= htmlspecialchars($row['product_image']) ?>" 
-  class="h-16 w-16 object-cover rounded-md"
-  alt="<?= htmlspecialchars($row['product_name']) ?>"
+                                <img
+    src="./uploads/products/<?= htmlspecialchars($row['product_image']) ?>"
+    class="h-16 w-16 object-cover rounded-md"
+    alt="<?= htmlspecialchars($row['product_name']) ?>"
 >
-
                             <?php else : ?>
                                 <span class="text-gray-400">No image</span>
                             <?php endif; ?>
