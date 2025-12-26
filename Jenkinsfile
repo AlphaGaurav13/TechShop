@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = "gaurious/techshop"
         DOCKER_TAG   = "latest"
         DOCKER_CREDS = "dockerhub-creds"
+        CONTAINER_NAME = "techshop_web"
     }
 
     stages {
@@ -15,19 +16,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to XAMPP') {
-            steps {
-                bat '''
-                echo Deploying to XAMPP...
-                if not exist C:\\xampp\\htdocs\\techshop (
-                    mkdir C:\\xampp\\htdocs\\techshop
-                )
-                xcopy /E /I /Y * C:\\xampp\\htdocs\\techshop
-                '''
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Build Docker Image (Same Tag)') {
             steps {
                 bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
             }
@@ -51,11 +40,13 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Restart Docker Container') {
             steps {
                 bat """
-                docker-compose down
-                docker-compose up -d
+                docker pull %DOCKER_IMAGE%:%DOCKER_TAG%
+                docker stop %CONTAINER_NAME%
+                docker rm %CONTAINER_NAME%
+                docker run -d --name %CONTAINER_NAME% -p 8090:80 %DOCKER_IMAGE%:%DOCKER_TAG%
                 """
             }
         }

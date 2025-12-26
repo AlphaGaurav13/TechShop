@@ -44,7 +44,7 @@ $result = $stmt->get_result();
             <a href="./index.php?product_id=<?= htmlspecialchars($product['product_id']) ?>" class="bg-white p-3 shadow rounded relative hover:shadow-lg transition m-[2.5px]"> <!-- Added m-[2.5px] -->
                 <div class="relative">
                   
-                        <img src="admin/productimge/<?= htmlspecialchars($product['product_image']) ?>" 
+                            <img src="Admin/productimge/<?= htmlspecialchars($product['product_image']) ?>" 
                              alt="<?= htmlspecialchars($product['product_name']) ?>" 
                              class="relative z-0 w-full h-32 object-contain mb-3 transform transition-transform duration-300 hover:scale-105"> <!-- Reduced mb-4 to mb-3 -->
                    

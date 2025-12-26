@@ -1,0 +1,16 @@
+-- Create users table if it doesn't exist
+CREATE TABLE IF NOT EXISTS users (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) DEFAULT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  confirmpassword VARCHAR(255) DEFAULT NULL,
+  dateandtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  address_line1 VARCHAR(255) DEFAULT NULL,
+  address_line2 VARCHAR(255) DEFAULT NULL,
+  city VARCHAR(100) DEFAULT NULL,
+  state VARCHAR(100) DEFAULT NULL,
+  postal_code VARCHAR(20) DEFAULT NULL,
+  country VARCHAR(100) DEFAULT NULL,
+  UNIQUE KEY uk_users_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

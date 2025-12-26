@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_email'])) {
   exit();
 }
 
-include 'partials/database.php';
+include '../partials/database.php';
 
 // Get cart items
 $sql = "SELECT c.quantity, p.product_id, p.product_name, p.product_desc, p.product_price, p.product_image
@@ -23,6 +23,34 @@ $result = $stmt->get_result();
 $subtotal = 0;
 $cart_items = [];
 
+// Get user address - check if columns exist first
+$user_address = [
+  'address_line1' => '',
+  'address_line2' => '',
+  'city' => '',
+  'state' => '',
+  'postal_code' => '',
+  'country' => ''
+];
+
+// Try to fetch address from users table
+$address_sql = "SELECT * FROM users WHERE email = ?";
+$address_stmt = $conn->prepare($address_sql);
+$address_stmt->bind_param("s", $_SESSION['user_email']);
+$address_stmt->execute();
+$address_result = $address_stmt->get_result();
+$user_data = $address_result->fetch_assoc();
+
+// Map available columns from user data
+if ($user_data) {
+  $user_address['address_line1'] = $user_data['address_line1'] ?? '';
+  $user_address['address_line2'] = $user_data['address_line2'] ?? '';
+  $user_address['city'] = $user_data['city'] ?? '';
+  $user_address['state'] = $user_data['state'] ?? '';
+  $user_address['postal_code'] = $user_data['postal_code'] ?? '';
+  $user_address['country'] = $user_data['country'] ?? '';
+}
+
 if ($result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
     $item_total = $row['product_price'] * $row['quantity'];
@@ -30,15 +58,6 @@ if ($result->num_rows > 0) {
     $cart_items[] = $row;
   }
 }
-
-// Get user address
-$address_sql = "SELECT address_line1, address_line2, city, state, postal_code, country 
-                FROM users WHERE email = ?";
-$address_stmt = $conn->prepare($address_sql);
-$address_stmt->bind_param("s", $_SESSION['user_email']);
-$address_stmt->execute();
-$address_result = $address_stmt->get_result();
-$user_address = $address_result->fetch_assoc();
 
 // Handle address form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_address'])) {
@@ -49,33 +68,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_address'])) {
   $postal_code = $_POST['postal_code'];
   $country = $_POST['country'];
   
-  $update_sql = "UPDATE users SET 
-                address_line1 = ?, 
-                address_line2 = ?, 
-                city = ?, 
-                state = ?, 
-                postal_code = ?, 
-                country = ? 
-                WHERE email = ?";
-  $update_stmt = $conn->prepare($update_sql);
-  $update_stmt->bind_param("sssssss", 
-    $address_line1, 
-    $address_line2, 
-    $city, 
-    $state, 
-    $postal_code, 
-    $country, 
-    $_SESSION['user_email']
-  );
+  $address_line1 = $_POST['address_line1'];
+  $address_line2 = $_POST['address_line2'] ?? '';
+  $city = $_POST['city'];
+  $state = $_POST['state'];
+  $postal_code = $_POST['postal_code'];
+  $country = $_POST['country'];
   
-  if ($update_stmt->execute()) {
-    $success_message = "Address updated successfully!";
-    // Refresh address data
-    $address_stmt->execute();
-    $address_result = $address_stmt->get_result();
-    $user_address = $address_result->fetch_assoc();
-  } else {
-    $error_message = "Failed to update address. Please try again.";
+  try {
+    $update_sql = "UPDATE users SET 
+                  address_line1 = ?, 
+                  address_line2 = ?, 
+                  city = ?, 
+                  state = ?, 
+                  postal_code = ?, 
+                  country = ? 
+                  WHERE email = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("sssssss", 
+      $address_line1, 
+      $address_line2, 
+      $city, 
+      $state, 
+      $postal_code, 
+      $country, 
+      $_SESSION['user_email']
+    );
+    
+    if ($update_stmt->execute()) {
+      $success_message = "Address updated successfully!";
+      // Refresh address data
+      $address_stmt->execute();
+      $address_result = $address_stmt->get_result();
+      $user_data = $address_result->fetch_assoc();
+      if ($user_data) {
+        $user_address['address_line1'] = $user_data['address_line1'] ?? '';
+        $user_address['address_line2'] = $user_data['address_line2'] ?? '';
+        $user_address['city'] = $user_data['city'] ?? '';
+        $user_address['state'] = $user_data['state'] ?? '';
+        $user_address['postal_code'] = $user_data['postal_code'] ?? '';
+        $user_address['country'] = $user_data['country'] ?? '';
+      }
+    } else {
+      $error_message = "Failed to update address. Please try again.";
+    }
+  } catch (Exception $e) {
+    $error_message = "Address columns not yet configured. Please contact support.";
   }
 }
 
@@ -162,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             <?php endif; ?>
             
             <!-- Address Form (hidden if address exists) -->
-            <form id="address-form" method="POST" action="index.php?checkout=true" class="<?= empty($user_address['address_line1']) ? '' : 'hidden' ?> mt-4 space-y-4">
+            <form id="address-form" method="POST" class="<?= empty($user_address['address_line1']) ? '' : 'hidden' ?> mt-4 space-y-4">
               <div>
                 <label for="address_line1" class="block text-sm font-medium text-gray-700">Address Line 1*</label>
                 <input type="text" id="address_line1" name="address_line1" required
@@ -381,70 +419,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
       }, 3000);
     }
   </script>
-  <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Toggle address form
-    const editAddressBtn = document.getElementById('edit-address-btn');
-    if (editAddressBtn) {
-        editAddressBtn.addEventListener('click', function() {
-            document.getElementById('address-form').classList.toggle('hidden');
-        });
-    }
-    
-    // Show error messages as toast
-    <?php if (isset($error_message)): ?>
-        showToast('<?= addslashes($error_message) ?>', 'error');
-    <?php endif; ?>
-    
-    <?php if (isset($success_message)): ?>
-        showToast('<?= addslashes($success_message) ?>', 'success');
-    <?php endif; ?>
-});
-
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-md shadow-md text-white font-medium animate__animated animate__fadeInRight ${
-        type === 'success' ? 'bg-green-500' : 'bg-red-500'
-    }`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('animate__fadeOutRight');
-        setTimeout(() => toast.remove(), 500);
-    }, 3000);
-}
-</script><script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Toggle address form
-    const editAddressBtn = document.getElementById('edit-address-btn');
-    if (editAddressBtn) {
-        editAddressBtn.addEventListener('click', function() {
-            document.getElementById('address-form').classList.toggle('hidden');
-        });
-    }
-    
-    // Show error messages as toast
-    <?php if (isset($error_message)): ?>
-        showToast('<?= addslashes($error_message) ?>', 'error');
-    <?php endif; ?>
-    
-    <?php if (isset($success_message)): ?>
-        showToast('<?= addslashes($success_message) ?>', 'success');
-    <?php endif; ?>
-});
-
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-md shadow-md text-white font-medium animate__animated animate__fadeInRight ${
-        type === 'success' ? 'bg-green-500' : 'bg-red-500'
-    }`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('animate__fadeOutRight');
-        setTimeout(() => toast.remove(), 500);
-    }, 3000);
-}
-</script>
