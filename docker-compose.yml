@@ -1,19 +1,25 @@
+version: "3.8"
+
 services:
   mysql:
     image: mysql:8.0
     container_name: techshop_mysql
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: techshop_db
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: techshop_phpmyadmin
-    restart: always
+    restart: unless-stopped
     ports:
       - "8083:80"
     environment:
@@ -21,22 +27,25 @@ services:
       PMA_USER: root
       PMA_PASSWORD: root
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   web:
     build: .
     container_name: techshop_web
+    restart: unless-stopped
     ports:
       - "8090:80"
     volumes:
-      - ./:/var/www/html        # 🔥 THIS IS THE MAGIC
+      - ./:/var/www/html
     environment:
       DB_HOST: mysql
       DB_USER: root
       DB_PASS: root
       DB_NAME: techshop_db
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
 volumes:
   mysql_data:
