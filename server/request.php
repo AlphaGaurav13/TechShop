@@ -36,9 +36,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     include '../partials/database.php';
     
-    // Start session to access user data (assuming you have user login system)
-    session_start();
-    
     $product_id = $_POST['product_id'] ?? '';
     $quantity = intval($_POST['quantity'] ?? 1);
     $user_email = $_SESSION['user_email'] ?? ''; // Get email from session
