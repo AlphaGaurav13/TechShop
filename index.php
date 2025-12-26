@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gaurav</title>
+  <title>Aaurav</title>
   <?php include './partials/commonfiles.php'; ?>
 </head>
 
